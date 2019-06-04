@@ -80,6 +80,6 @@ theme: next
 deploy:
   type: git
   repo: https://github.com/Heyxk/Heyxk.github.io.git
-  branch: gh-pages
+  branch: master
   name: Heyxk
   email: 1521048028@qq.com
