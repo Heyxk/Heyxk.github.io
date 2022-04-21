@@ -31,4 +31,4 @@ jobs:
           keep_files: false
           publish_branch: master
           # 如果使用自定义域名，还需要添加下面一行配置
-          cname: www.cookbyte.net
+          # cname: cookbyte.net
