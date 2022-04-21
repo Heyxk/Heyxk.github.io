@@ -1,0 +1,34 @@
+name: Generate Site
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build-deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v2
+        with:
+          submodules: true  # Fetch Hugo themes (true OR recursive) 获取submodule主题
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+
+      - name: Setup hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: "latest" # 可以修改为你使用的 Hugo 版本
+          extended: true # 设置是否需要 extended 版本
+
+      - name: Build
+        run: hugo --minify
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.DEPLOY_TOKEN }} # 另外还支持 github_token 和 personal_token
+          external_repository: Heyxk/Heyxk.github.io # GitHub Pages 仓库
+          publish_dir: ./public
+          keep_files: false
+          publish_branch: master
+          # 如果使用自定义域名，还需要添加下面一行配置
+          cname: www.cookbyte.net
