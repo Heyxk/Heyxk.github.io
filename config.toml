@@ -1,6 +1,6 @@
 baseURL = "https://cookbyte.net"
 languageCode = "en"
-defaultContentLanguage = "zh-cn"                             # en / zh-cn / ... (This field determines which i18n file to use)
+defaultContentLanguage = "en"                             # en / zh-cn / ... (This field determines which i18n file to use)
 title = "k - blog"
 preserveTaxonomyNames = true
 enableRobotsTXT = true
