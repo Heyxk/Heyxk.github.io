@@ -12,12 +12,21 @@ jobs:
         with:
           submodules: true  # Fetch Hugo themes (true OR recursive) 获取submodule主题
           fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+        run: echo "check files" && ls -al
 
       - name: Setup hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: "latest" # 可以修改为你使用的 Hugo 版本
           extended: true # 设置是否需要 extended 版本
+        run: echo "check files" && ls -al
+
+      - name: Modify theme-even font
+        run: |
+          sed -i "s/\$global-serif-font-family: Athelas, STHeiti, Microsoft Yahei, serif \!default;/\$global-serif-font-family: 'PingFang SC', 'Microsoft Yahei', sans-serif \!default;/g" themes/even/assets/sass/_variables.scss
+          sed -i "s/\$logo-font-family: 'Chancery', cursive, LiSu, sans-serif \!default;/\$logo-font-family: 'PingFang SC', 'Microsoft YaHei', cursive, LiSu, sans-serif \!default;/g" themes/even/assets/sass/_variables.scss
+          sed -i "/\/\/ Font family: Chancery/,+13d" themes/even/assets/sass/_variables.scss
+          rm -r themes/even/static/fonts/chancery
 
       - name: Build
         run: hugo --minify
