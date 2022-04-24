@@ -12,14 +12,12 @@ jobs:
         with:
           submodules: true  # Fetch Hugo themes (true OR recursive) 获取submodule主题
           fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
-        run: echo "check files" && ls -al
 
       - name: Setup hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: "latest" # 可以修改为你使用的 Hugo 版本
           extended: true # 设置是否需要 extended 版本
-        run: echo "check files" && ls -al
 
       - name: Modify theme-even font
         run: |
