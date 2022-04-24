@@ -23,6 +23,7 @@ jobs:
         run: |
           sed -i "s/\$global-serif-font-family: Athelas, STHeiti, Microsoft Yahei, serif \!default;/\$global-serif-font-family: 'PingFang SC', 'Microsoft Yahei', sans-serif \!default;/g" themes/even/assets/sass/_variables.scss
           sed -i "s/\$logo-font-family: 'Chancery', cursive, LiSu, sans-serif \!default;/\$logo-font-family: 'PingFang SC', 'Microsoft YaHei', cursive, LiSu, sans-serif \!default;/g" themes/even/assets/sass/_variables.scss
+          sed -i "s/\$theme-color-config: 'Default';/\$theme-color-config: 'Mint Green';/g" themes/even/assets/sass/_variables.scss
           sed -i "/\/\/ Font family: Chancery/,+13d" themes/even/assets/sass/_variables.scss
           rm -r themes/even/static/fonts/chancery
 
