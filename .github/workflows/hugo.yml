@@ -26,6 +26,7 @@ jobs:
           sed -i "s/\$theme-color-config: 'Default';/\$theme-color-config: 'Mint Green';/g" themes/even/assets/sass/_variables.scss
           sed -i "/\/\/ Font family: Chancery/,+13d" themes/even/assets/sass/_variables.scss
           rm -r themes/even/static/fonts/chancery
+          rm -r themes/even/static/img/reward
 
       - name: Build
         run: hugo --minify
