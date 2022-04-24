@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://cookbyte.net/sitemap.xml
