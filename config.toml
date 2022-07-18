@@ -54,8 +54,18 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   identifier = "journals"
   url = "/journal/"
 [[menu.main]]
-  name = "About"
+  name = "English"
   weight = 60
+  identifier = "english"
+  url = "/english"
+[[menu.main]]
+  name = "Fitness"
+  weight = 70
+  identifier = "fitness"
+  url = "/fitness"
+[[menu.main]]
+  name = "About"
+  weight = 80
   identifier = "about"
   url = "/about"
 
