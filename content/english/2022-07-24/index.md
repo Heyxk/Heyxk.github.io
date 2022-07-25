@@ -21,3 +21,7 @@ draft: false
 - announce
 
 - assert
+
+  > assertion
+
+  > assertive
