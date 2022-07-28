@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>k - blog</title><link>https://cookbyte.net/</link><description>Recent content on k - blog</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 27 Jul 2022 15:29:00 +0000</lastBuildDate><atom:link href="https://cookbyte.net/index.xml" rel="self" type="application/rss+xml"/><item><title>2022-07-27</title><link>https://cookbyte.net/english/2022-07-27/</link><pubDate>Wed, 27 Jul 2022 15:29:00 +0000</pubDate><guid>https://cookbyte.net/english/2022-07-27/</guid><description>Jul 27, 2022 rule
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>k - blog</title><link>https://cookbyte.net/</link><description>Recent content on k - blog</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Thu, 28 Jul 2022 15:11:24 +0000</lastBuildDate><atom:link href="https://cookbyte.net/index.xml" rel="self" type="application/rss+xml"/><item><title>2022-07-28</title><link>https://cookbyte.net/english/2022-07-28/</link><pubDate>Thu, 28 Jul 2022 15:11:24 +0000</pubDate><guid>https://cookbyte.net/english/2022-07-28/</guid><description>Jul 28, 2022 code
+to make itself subject to the code of conduct
+law
+lawful
+statute
+bill</description></item><item><title>learn-golang</title><link>https://cookbyte.net/post/learn-golang/</link><pubDate>Thu, 28 Jul 2022 12:31:47 +0000</pubDate><guid>https://cookbyte.net/post/learn-golang/</guid><description>Jul 28, 2022 Golang 学习笔记 字符串 字符串可以使用range访问 1 2 3 4 5 s := &amp;#34;test&amp;#34; for i, v := range s { // the type of v is rune fmt.Printf(&amp;#34;index %d, value %c&amp;#34;) } s := &amp;quot;test&amp;quot; s是常量, 无法通过下标进行修改</description></item><item><title>2022-07-27</title><link>https://cookbyte.net/english/2022-07-27/</link><pubDate>Wed, 27 Jul 2022 15:29:00 +0000</pubDate><guid>https://cookbyte.net/english/2022-07-27/</guid><description>Jul 27, 2022 rule
 ruling
 ruler
 adminster
