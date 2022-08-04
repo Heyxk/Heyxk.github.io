@@ -2,6 +2,7 @@
 title: 2022-08-03
 date: 2022-08-03 15:44:46
 lastmod: 2022-08-03 15:44:46
+author: "k"
 description: "每日词汇"
 keywords: ["vocabulary"]
 tags: ["vocabulary"]
