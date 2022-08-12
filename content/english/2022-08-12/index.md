@@ -1,7 +1,7 @@
 ---
 title: 每日词汇
-date: 2022-08-11 15:36:16
-lastmod: 2022-08-11 15:36:16
+date: 2022-08-12 12:20:21
+lastmod: 2022-08-12 12:20:21
 author: "k"
 description: "每日英语词汇"
 keywords: ["vocabulary"]
@@ -12,16 +12,17 @@ toc: true
 draft: false
 ---
 
-# Aug 11, 2022
+# Aug 12, 2022
 
-- ethic
+- consider
 
-- integrity
 
-- conscience
+  > considerable
 
-- appreciate
+  > considerate
 
-- cherish
+  > consideration
 
-- treasure
+  > considering
+
+- suppose
