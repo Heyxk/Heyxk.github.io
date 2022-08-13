@@ -1,5 +1,5 @@
 ---
-title: 每日词汇
+title: "每日词汇"
 date: 2022-08-12 12:20:21
 lastmod: 2022-08-12 12:20:21
 author: "k"
@@ -16,6 +16,13 @@ draft: false
 
 - consider
 
+  > In classical antiquity, genius wasn't considered a talent of the result of effort but a divine spirit.
+
+  > antiquity
+
+  > divine
+
+  - spirit
 
   > considerable
 
@@ -26,3 +33,9 @@ draft: false
   > considering
 
 - suppose
+
+  > be supposed to serve as helpful advisors
+
+  > supposition
+
+  > supposedly
