@@ -12,7 +12,6 @@ toc: true
 draft: false
 ---
 
-# Jul 28, 2022
 
 # Golang 学习笔记
 

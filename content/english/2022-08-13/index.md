@@ -1,7 +1,7 @@
 ---
 date: 2022-08-13 03:22:50
 lastmod: 2022-08-13 03:22:50
-title: "每次词汇"
+title: "每日词汇"
 author: "k"
 description: "每日英语词汇"
 keywords: ["vocabulary"]
@@ -30,3 +30,7 @@ draft: false
   > crucial
 
   > democratic
+
+  > regarding
+
+  > regardless
