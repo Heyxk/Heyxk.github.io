@@ -1,0 +1,235 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>malloc-error-on-linux - k - blog</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="k"><meta name=description content="linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM"><meta name=keywords content="linux,C/C++,mmap,ENOMEM,new,malloc"><meta name=generator content="Hugo 0.104.1 with theme even"><link rel=canonical href=https://cookbyte.net/post/malloc-error-on-linux/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.0c7e7da8c1c43ff699e736c73e8d2a620309834483597be8e0e01e53006dc385.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="malloc-error-on-linux"><meta property="og:description" content="linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM"><meta property="og:type" content="article"><meta property="og:url" content="https://cookbyte.net/post/malloc-error-on-linux/"><meta property="article:section" content="post"><meta property="article:published_time" content="2022-09-27T13:28:22+00:00"><meta property="article:modified_time" content="2022-09-27T23:05:15+08:00"><meta itemprop=name content="malloc-error-on-linux"><meta itemprop=description content="linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM"><meta itemprop=datePublished content="2022-09-27T13:28:22+00:00"><meta itemprop=dateModified content="2022-09-27T23:05:15+08:00"><meta itemprop=wordCount content="4090"><meta itemprop=keywords content="linue,C/C++,"><meta name=twitter:card content="summary"><meta name=twitter:title content="malloc-error-on-linux"><meta name=twitter:description content="linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>k</a></div><div class=mobile-navbar-icon><span></span>
+<span></span>
+<span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a><a href=/journal/><li class=mobile-menu-item>Journals</li></a><a href=/english><li class=mobile-menu-item>English</li></a><a href=/fitness><li class=mobile-menu-item>Fitness</li></a><a href=/about><li class=mobile-menu-item>About</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>k</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li><li class=menu-item><a class=menu-item-link href=/journal/>Journals</a></li><li class=menu-item><a class=menu-item-link href=/english>English</a></li><li class=menu-item><a class=menu-item-link href=/fitness>Fitness</a></li><li class=menu-item><a class=menu-item-link href=/about>About</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>malloc-error-on-linux</h1><div class=post-meta><span class=post-time>2022-09-27 13:28:22</span><div class=post-category><a href=/categories/c/c++/>C/C++</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#linux下newmalloc内存分配失败问题分析---mmap系统调用返回enomem>linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM</a><ul><li><a href=#问题背景>问题背景</a></li><li><a href=#问题分析过程>问题分析过程</a><ul><li><a href=#review优化代码>review优化代码</a></li><li><a href=#降低gcc版本>降低gcc版本</a></li><li><a href=#分析core文件>分析core文件</a></li><li><a href=#缩小问题范围>缩小问题范围</a></li><li><a href=#strace跟踪>strace跟踪</a></li><li><a href=#继续尝试>继续尝试</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><h1 id=linux下newmalloc内存分配失败问题分析---mmap系统调用返回enomem>linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM</h1><h2 id=问题背景>问题背景</h2><p>公司新产品需要高性能业务平台, 需要对现有的平台进行性能优化, 进行一系列优化后, 性能提升50%左右, 但是做性能测试时发现, 进程存在使用 <code>new/malloc</code> 分配内存时失败的情况, 导致进程coredump, 无法完成稳定性行测试, 于是通过 <code>valgrind</code> 和 <code>strace</code> 等工具分析定位高负载情况下, 进程分配内存失败问题.</p><h2 id=问题分析过程>问题分析过程</h2><h3 id=review优化代码>review优化代码</h3><p>在做性能测试时, 数据是通过将量打到本机cpu消耗70%时的数据作为对比数据, 使用优化后的版本进行70%cpu压测时, 跑一段时间后, 进程会报告内存分配失败问题. 遇到该问题时首先想到, 可能是优化部分代码有问题, 毕竟做了多线程优化, 可能是有数据竞争问题, 导致跑一段时间内存被破坏了, 这么怀疑的原因是, <em>使用优化前版本跑70%cpu压测稳定24小时不会出现此问题</em> , 于是乎, 对代码进行review, 翻来覆去看了几遍, 没发现有异常地方.</p><h3 id=降低gcc版本>降低gcc版本</h3><p>进行过代码review之后, 没有发现有问题的地方. 于是想到另一个方面, 本次优化还有一个变化是迁移了系统, 从centos迁移到了openEuler系统, openEuler系统的gcc(gcc10)版本比之前使用的
+gcc(4.8.5)高出很多, 由于平台代码历史有二十多年, 所以使用的还是<code>gnu++98</code> 标准写的, 其中的有些语法在高版本上编译不过, 需要修改, 还有很多写法不规范的地方, 在gcc10开启 <code>-O2</code> 优化下, 进程会重启, 例如非 <code>void</code> 函数没写返回值等. 所以怀疑是gcc版本太高, 代码里不规范的地方太多, 没有修改完, 所以运行会有问题, 因此在openEuler系统上编译了gcc4.8.5, 使用低版本gcc进行代码编译, 废了一番劲编译好gcc之后, 使用低版本gcc编译平台代码, 进行性能测试, 发现还是会出现内存分配失败的情况, 这么看来, 该问题和gcc版本没有关系.</p><h3 id=分析core文件>分析core文件</h3><p>尝试过回退gcc版本后问题依旧, 于是还是来分析core文件, 分析core文件发现几个现象:</p><ul><li>出core的地方不同</li><li>几乎都是关于内存分配的地方
+core一例</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>[</span>Current thread is <span class=m>1</span> <span class=o>(</span>Thread 0x7f0d967fc640 <span class=o>(</span>LWP 55019<span class=o>))]</span>
+</span></span><span class=line><span class=cl><span class=o>(</span>gdb<span class=o>)</span> bt
+</span></span><span class=line><span class=cl><span class=c1>#0  0x00007f0dfc9951be in TemplateClass::TemplateClass (this=0x10) at TemplateClass.hpp:54</span>
+</span></span><span class=line><span class=cl><span class=c1>#1  0x00007f0dfc997878 in UEInstance::UEInstance (this=0x10) at UEInstance.hpp:11</span>
+</span></span><span class=line><span class=cl><span class=c1>#2  0x00007f0dfc998fdf in __gnu_cxx::new_allocator&lt;UEInstance&gt;::construct (this=0x7f0d967faf67, __p=0x10, __val=...)</span>
+</span></span><span class=line><span class=cl>    at /opt/gcc4.8.5/include/c++/4.8.5/ext/new_allocator.h:130
+</span></span><span class=line><span class=cl><span class=c1>#3  0x00007f0dfc993a10 in std::list&lt;UEInstance, std::allocator&lt;UEInstance&gt; &gt;::_M_create_node (this=0x232488e8,</span>
+</span></span><span class=line><span class=cl>    <span class=nv>__x</span><span class=o>=</span>...<span class=o>)</span> at /opt/gcc4.8.5/include/c++/4.8.5/bits/stl_list.h:487
+</span></span><span class=line><span class=cl><span class=c1>#4  0x00007f0dfc991c19 in std::list&lt;UEInstance, std::allocator&lt;UEInstance&gt; &gt;::_M_insert (this=0x232488e8,</span>
+</span></span><span class=line><span class=cl>    <span class=nv>__position</span><span class=o>=</span>..., <span class=nv>__x</span><span class=o>=</span>...<span class=o>)</span> at /opt/gcc4.8.5/include/c++/4.8.5/bits/stl_list.h:1553
+</span></span><span class=line><span class=cl><span class=c1>#5  0x00007f0dfc99030e in std::list&lt;UEInstance, std::allocator&lt;UEInstance&gt; &gt;::push_back (this=0x232488e8, __x=...)</span>
+</span></span><span class=line><span class=cl>    at /opt/gcc4.8.5/include/c++/4.8.5/bits/stl_list.h:1016
+</span></span><span class=line><span class=cl><span class=c1>#6  0x00007f0dfc97e005 in SessionProcess::createUEInstance (this=0x23248700, ueName=Calling) at SessionProcess.C:854</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>(</span>gdb<span class=o>)</span> bt
+</span></span><span class=line><span class=cl><span class=c1>#0  ___pthread_mutex_trylock (mutex=mutex@entry=0x28e8) at pthread_mutex_trylock.c:34</span>
+</span></span><span class=line><span class=cl><span class=c1>#1  0x00007f3c10ea81e4 in malloc_mutex_trylock_final (mutex=0x28a8) at include/jemalloc/internal/mutex.h:157</span>
+</span></span><span class=line><span class=cl><span class=c1>#2  malloc_mutex_lock (mutex=0x28a8, tsdn=0x7f3bb93febf0) at include/jemalloc/internal/mutex.h:216</span>
+</span></span><span class=line><span class=cl><span class=c1>#3  je_tcache_arena_associate (tsdn=0x7f3bb93febf0, tcache_slow=0x7f3bb93fecf0, tcache=0x7f3bb93fef48, arena=0x0) at src/tcache.c:588</span>
+</span></span><span class=line><span class=cl><span class=c1>#4  0x00007f3c10ea959e in arena_choose_impl (arena=0x0, internal=false, tsd=0x7f3bb93febf0) at include/jemalloc/internal/jemalloc_internal_inlines_b.h:60</span>
+</span></span><span class=line><span class=cl><span class=c1>#5  arena_choose (arena=0x0, tsd=0x7f3bb93febf0) at include/jemalloc/internal/jemalloc_internal_inlines_b.h:88</span>
+</span></span><span class=line><span class=cl><span class=c1>#6  je_tsd_tcache_data_init (tsd=tsd@entry=0x7f3bb93febf0) at src/tcache.c:740</span>
+</span></span><span class=line><span class=cl><span class=c1>#7  0x00007f3c10ea9753 in je_tsd_tcache_enabled_data_init (tsd=tsd@entry=0x7f3bb93febf0) at src/tcache.c:644</span>
+</span></span><span class=line><span class=cl><span class=c1>#8  0x00007f3c10eab1b9 in tsd_data_init (tsd=0x7f3bb93febf0) at src/tsd.c:244</span>
+</span></span><span class=line><span class=cl><span class=c1>#9  je_tsd_fetch_slow (tsd=0x7f3bb93febf0, minimal=minimal@entry=false) at src/tsd.c:311</span>
+</span></span><span class=line><span class=cl><span class=c1>#10 0x00007f3c10e53823 in tsd_fetch_impl (init=true, minimal=false) at include/jemalloc/internal/tsd.h:422</span>
+</span></span><span class=line><span class=cl><span class=c1>#11 tsd_fetch () at include/jemalloc/internal/tsd.h:448</span>
+</span></span><span class=line><span class=cl><span class=c1>#12 imalloc (dopts=&lt;synthetic pointer&gt;, sopts=&lt;synthetic pointer&gt;) at src/jemalloc.c:2681</span>
+</span></span><span class=line><span class=cl><span class=c1>#13 je_malloc_default (size=32) at src/jemalloc.c:2722</span>
+</span></span><span class=line><span class=cl><span class=c1>#14 0x000000000070df73 in mynew (size=32) at unix/memtest.C:30</span>
+</span></span><span class=line><span class=cl><span class=c1>#15 0x0000000000aea452 in TAs_slp::run (this=0x7f3bc24b1200, ptr=0x2281e770 &lt;buffer_TMsg+1200&gt;) at lib/as_slp.C:126</span>
+</span></span><span class=line><span class=cl><span class=c1>#16 0x00000000006587c8 in CWorkerThread::run (this=0x7f3bc553a020) at scmectrl/threadCom.C:149</span>
+</span></span><span class=line><span class=cl><span class=c1>#17 0x0000000000656b5a in CThread::ThreadFunction (point=0x7f3bc553a020) at scmectrl/threadBase.C:33</span>
+</span></span><span class=line><span class=cl><span class=c1>#18 0x00007f3c10ad132a in start_thread (arg=&lt;optimized out&gt;) at pthread_create.c:443</span>
+</span></span><span class=line><span class=cl><span class=c1>#19 0x00007f3c10b53370 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81</span>
+</span></span><span class=line><span class=cl><span class=o>(</span>gdb<span class=o>)</span> f <span class=m>15</span>
+</span></span><span class=line><span class=cl><span class=c1>#15 0x0000000000aea452 in TAs_slp::run (this=0x7f3bc24b1200, ptr=0x2281e770 &lt;buffer_TMsg+1200&gt;) at lib/as_slp.C:126</span>
+</span></span><span class=line><span class=cl>warning: Source file is more recent than executable.
+</span></span><span class=line><span class=cl>Python Exception &lt;class <span class=s1>&#39;UnicodeDecodeError&#39;</span>&gt;: <span class=s1>&#39;utf-8&#39;</span> codec can<span class=err>&#39;</span>t decode byte 0xbd in position 4955: invalid start byte
+</span></span><span class=line><span class=cl><span class=m>126</span>                     <span class=nv>cm</span> <span class=o>=</span> new TComponentManager<span class=o>(</span>this<span class=o>)</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=o>(</span>gdb<span class=o>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>看了几百个core, 发生错误的地方不尽相同, 没有发现明显的规律, 这使得问题分析变得困难起来, 因为之前就有定位过一个类似的情况: 进程在随机的地方coredump, 没有规律, 最后找了很久才找到是业务使用了已销毁的元素, 导致内存被破坏, 这种难点在于进程不会在代码有问题的地方重启, 而是继续跑一段时间, 访问到了被破坏的内存, 才会重启.
+还是怀疑到了修改的代码身上, 但是对修改的代码反复检查, 实在是找不到值得怀疑的地方.
+于是观察进程重启时的情况, 发现以下几个现象:</p><ul><li>进程重启的数据cpu占用会迅速上升, 内存占用会迅速上升</li><li>进程报告分配内存失败时, 内存剩余还很多, 不是内存用尽问题</li></ul><p>基于这两个现象, 使用valgrind跟踪进程运行情况, 未发现进程有内存泄漏的情况.</p><p>没有好的思路, 只能去网上检索相关问题, 大概找到了一下几个会影响进程申请内存的配置</p><ul><li>ulimit -v</li></ul><blockquote><p>虚拟内存限制, 该配置会影响进程虚拟地址空间的大小, 如果过小的话, 虚拟地址空间不足, 会导致申请不到内存问题</p></blockquote><ul><li>overcommit_memory</li></ul><blockquote><p>0 表示内核将检查是否有足够的可用内存供应用进程使用, 如果有足够的可用内存, 内存申请允许, 否则, 内存申请失败, 并把错误返回给应用进程.
+1 表示内核允许分配所有的物理内存, 而不管当前的内存状态如何.
+2 表示内核允许分配超过所有物理内存和交换空间总和的内存.</p></blockquote><p>检查系统设置的虚拟内存限制为<code>unlimited</code>, <code>overcommit_memory</code> 配置为0, 遂将<code>overcommit_memory</code> 修改为1, 测试问题依旧.</p><p>经过以上分析后, 已有情况如下:
+<strong>配置:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ <span class=nb>ulimit</span> -a
+</span></span><span class=line><span class=cl>real-time non-blocking <span class=nb>time</span>  <span class=o>(</span>microseconds, -R<span class=o>)</span> unlimited
+</span></span><span class=line><span class=cl>core file size              <span class=o>(</span>blocks, -c<span class=o>)</span> unlimited
+</span></span><span class=line><span class=cl>data seg size               <span class=o>(</span>kbytes, -d<span class=o>)</span> unlimited
+</span></span><span class=line><span class=cl>scheduling priority                 <span class=o>(</span>-e<span class=o>)</span> <span class=m>0</span>
+</span></span><span class=line><span class=cl>file size                   <span class=o>(</span>blocks, -f<span class=o>)</span> unlimited
+</span></span><span class=line><span class=cl>pending signals                     <span class=o>(</span>-i<span class=o>)</span> <span class=m>127250</span>
+</span></span><span class=line><span class=cl>max locked memory           <span class=o>(</span>kbytes, -l<span class=o>)</span> <span class=m>64</span>
+</span></span><span class=line><span class=cl>max memory size             <span class=o>(</span>kbytes, -m<span class=o>)</span> unlimited
+</span></span><span class=line><span class=cl>open files                          <span class=o>(</span>-n<span class=o>)</span> <span class=m>32768</span>
+</span></span><span class=line><span class=cl>pipe size                <span class=o>(</span><span class=m>512</span> bytes, -p<span class=o>)</span> <span class=m>8</span>
+</span></span><span class=line><span class=cl>POSIX message queues         <span class=o>(</span>bytes, -q<span class=o>)</span> <span class=m>819200</span>
+</span></span><span class=line><span class=cl>real-time priority                  <span class=o>(</span>-r<span class=o>)</span> <span class=m>0</span>
+</span></span><span class=line><span class=cl>stack size                  <span class=o>(</span>kbytes, -s<span class=o>)</span> <span class=m>8192</span>
+</span></span><span class=line><span class=cl>cpu <span class=nb>time</span>                   <span class=o>(</span>seconds, -t<span class=o>)</span> unlimited
+</span></span><span class=line><span class=cl>max user processes                  <span class=o>(</span>-u<span class=o>)</span> <span class=m>127250</span>
+</span></span><span class=line><span class=cl>virtual memory              <span class=o>(</span>kbytes, -v<span class=o>)</span> unlimited
+</span></span><span class=line><span class=cl>file locks                          <span class=o>(</span>-x<span class=o>)</span> unlimited
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ cat /proc/sys/vm/overcommit_memory
+</span></span><span class=line><span class=cl><span class=m>1</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>现象:</strong></p><ul><li>内存充足, new/malloc失败</li><li>同等压力下进程数少更容易出现</li><li>启动终端下ulimit无限制</li></ul><h3 id=缩小问题范围>缩小问题范围</h3><p>分析到这里, 并没有其他好的思路, 于是准备缩小问题范围.
+检查问题是新引入还是旧版本就存在: 由于之前测试过程中, 一直采用的是cpu压测到70%, 但是存在的问题是, 旧版本性能跑不到新版本的量, 既然是存在内存分配问题, 那么如果将旧版本压测到新版本的量, 是否会出现此问题呢?, 于是马上进行了测试, 果然, 旧版本压力上去后, 也出现了这个情况, 且core基本类似. 说明该问题是一直存在的问题, 只是以前没有跑到那么大量, 没有出现而已. 至此已经可以排除优化代码问题.</p><p>同时, 根据这个现象, 检查了系统上其他进程, 并没有出现此现象.</p><p>接下来手动写了测试代码, 测试不停分配内存, 看是否能分配完主机内存, 结果是测试代码能完全分配主机内存, 这现象说明主机配置没问题, 是进程本身问题.</p><p>于是怀疑是否是某些编译参数导致进程有限制?
+首先想到的是进程架构, 检查发现编译时, 指定了 <code>-m64</code>, 编译的是64位进程, 不存在32位进程的虚拟地址空间限制.</p><h3 id=strace跟踪>strace跟踪</h3><p>经过上述分析, 虽然问题缩小了范围, 但是仍然不好分析, 于是使用strace跟踪系统调用, 看出问题时的情况</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>60122 18:03:29.113460 mmap(NULL, 8388608, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0 &lt;unfinished ...&gt;
+</span></span><span class=line><span class=cl>52927 18:03:29.113508 &lt;... futex resumed&gt;) = 0 &lt;0.000051&gt;
+</span></span><span class=line><span class=cl>60122 18:03:29.113636 &lt;... mmap resumed&gt;) = -1 ENOMEM (Cannot allocate memory) &lt;0.000165&gt;
+</span></span></code></pre></td></tr></table></div></div><p>使用strace跟踪进程系统调用发下, 在申请内存时, 系统调用mmap返回了 <code>ENOMEM</code> 错误, 提示无法分配内存</p><h4 id=linux动态内存管理>linux动态内存管理</h4><p>两种动态内存管理的方法: 堆内存分配和mmap的内存分配, 此两种分配方法都是通过相应的Linux 系统调用来进行动态内存管理的. 具体使用哪一种方式分配, 根据glibc的实现, 主要取决于所需分配内存的大小.</p><p><strong>用brk实现进程里堆内存分配</strong>
+在glibc中，当进程所需要的内存较小时, 小于128k的内存, 使用brk分配内存, 将_edata往高地址推(只分配虚拟空间，不对应物理内存(因此没有初始化)，第一次读/写数据时，引起内核缺页中断，内核才分配对应的物理内存，然后虚拟地址空间建立映射关系), 但是堆分配出来的内存空间, 系统一般不会回收, 只有当进程的堆大小到达最大限额时或者没有足够连续大小的空间来为进程继续分配所需内存时, 才会回收不用的堆内存. 在这种方式下, glibc会为进程堆维护一些固定大小的内存池以减少内存碎片.</p><p><strong>使用mmap的内存分配</strong>
+在glibc中, 一般在比较大的内存分配时使用mmap系统调用, 它以页为单位来分配内存的(在Linux中, 一般一页大小定义为4K), 这不可避免会带来内存浪费, 但是当进程调用free释放所分配的内存时, glibc会立即调用unmmap, 把所分配的内存空间释放回系统.</p><blockquote><p><a href=https://blog.csdn.net/yusiguyuan/article/details/39496057>https://blog.csdn.net/yusiguyuan/article/details/39496057</a>
+<a href=https://www.cnblogs.com/Courage129/p/14232306.html>https://www.cnblogs.com/Courage129/p/14232306.html</a>
+<a href=https://www.cnblogs.com/Courage129/p/14231781.html>https://www.cnblogs.com/Courage129/p/14231781.html</a>
+<a href=https://www.cnblogs.com/arnoldlu/p/12156368.html>https://www.cnblogs.com/arnoldlu/p/12156368.html</a></p></blockquote><p>从strace跟踪结果看, 是mmap系统调用返回了错误, 因此继续分析失败原因
+查了一圈资料, <code>max_map_count</code> 参数可能会导致mmap返ENOMEM, 于是尝试调大该值, 测试仍没有效果.</p><blockquote><p>This file contains the maximum number of memory map areas a process may have. Memory map areas are used as a side-effect of calling malloc, directly by mmap and mprotect, and also when loading shared libraries.
+While most applications need less than a thousand maps, certain programs, particularly malloc debuggers, may consume lots of them, e.g., up to one or two maps per allocation.
+The default value is 65536.</p></blockquote><p>分析到这里, 再次失去了方向, 为啥有大量可用内存, 地址空间未限制, 但是进程无法分配到内存呢?</p><h3 id=继续尝试>继续尝试</h3><p>分析到这里, 感觉能用的办法都用了, 但是仍找不到问题, 于是乎, 我在代码入口处加了个分配内存测试的代码, 死循环分配, 观察下现象, 结果让人眼前一亮, 感觉看到了希望的曙光, 即使是不要业务, 单单内存分配, 进程也会在分配几百M后出现分配失败的问题, 这一下就让问题范围缩小到极致, 之前怀疑可能是内存破坏导致, 但是由于要性能测试时才会出现, 所以没有好方法跟踪到重启时的内存情况, 这个测试结果说明跟跑业务没关系, 在加上之前单独写了测试代码, 测试能够分配完所有内存, 这就让问题变得清晰起来, 为啥只有这个进程有内存限制, 但是测试进程没有呢, 于是马上想到, 之前查看的所有ulimit配置都是只看了启动终端下的结果, 没有看进程实际的limits, 果断查了正在重启的进程limits</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ cat /proc/14402/limits
+</span></span><span class=line><span class=cl>Limit                     Soft Limit           Hard Limit           Units
+</span></span><span class=line><span class=cl>Max cpu <span class=nb>time</span>              unlimited            unlimited            seconds
+</span></span><span class=line><span class=cl>Max file size             unlimited            unlimited            bytes
+</span></span><span class=line><span class=cl>Max data size             <span class=m>900000000</span>            unlimited            bytes
+</span></span><span class=line><span class=cl>Max stack size            <span class=m>8388608</span>              unlimited            bytes
+</span></span><span class=line><span class=cl>Max core file size        unlimited            unlimited            bytes
+</span></span><span class=line><span class=cl>Max resident <span class=nb>set</span>          unlimited            unlimited            bytes
+</span></span><span class=line><span class=cl>Max processes             <span class=m>4096</span>                 <span class=m>31152</span>                processes
+</span></span><span class=line><span class=cl>Max open files            <span class=m>65536</span>                <span class=m>65536</span>                files
+</span></span><span class=line><span class=cl>Max locked memory         <span class=m>65536</span>                <span class=m>65536</span>                bytes
+</span></span><span class=line><span class=cl>Max address space         unlimited            unlimited            bytes
+</span></span><span class=line><span class=cl>Max file locks            unlimited            unlimited            locks
+</span></span><span class=line><span class=cl>Max pending signals       <span class=m>31152</span>                <span class=m>31152</span>                signals
+</span></span><span class=line><span class=cl>Max msgqueue size         <span class=m>819200</span>               <span class=m>819200</span>               bytes
+</span></span><span class=line><span class=cl>Max nice priority         <span class=m>0</span>                    <span class=m>0</span>
+</span></span><span class=line><span class=cl>Max realtime priority     <span class=m>0</span>                    <span class=m>0</span>
+</span></span><span class=line><span class=cl>Max realtime timeout      unlimited            unlimited            us
+</span></span><span class=line><span class=cl>scpas@eb60159&gt;
+</span></span></code></pre></td></tr></table></div></div><p>果然一看结果, 和shell中设置的data size不一致, 启动进程的shell中设置的是unlimited, 但是进程的值限制到了900000000
+通过prlimit命令修改了进程的data size, 果然, 进程不再重启, 问题解决</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>prlimit -d<span class=o>=</span>unlimited:unlimited -p <span class=m>14402</span>
+</span></span></code></pre></td></tr></table></div></div><p>但是为啥进程没有继承shell的ulimit配置, 而是被限制到了900000000呢, 思考了一下进程启动方式, 平台的进程是通过一个守护进程<code>init</code> 启动, 肯定是跟该进程有关, 于是尝试手动在终端下启动主进程, 查看果然, data size未unlimited, 内存分配没有问题.</p><p>于是立马把守护进程代码翻出来检查, 终于找到了罪魁祸首:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=kt>int</span> <span class=nf>setLimit</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>struct</span> <span class=nc>rlimit</span> <span class=n>x</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>ret</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>ret</span> <span class=o>=</span> <span class=n>getrlimit</span><span class=p>(</span><span class=n>RLIMIT_CORE</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>x</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>x</span><span class=p>.</span><span class=n>rlim_cur</span> <span class=o>=</span> <span class=n>x</span><span class=p>.</span><span class=n>rlim_max</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>ret</span> <span class=o>=</span> <span class=n>setrlimit</span><span class=p>(</span><span class=n>RLIMIT_CORE</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>x</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>ret</span> <span class=o>=</span> <span class=n>getrlimit</span><span class=p>(</span><span class=n>RLIMIT_DATA</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>x</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>x</span><span class=p>.</span><span class=n>rlim_cur</span> <span class=o>=</span> <span class=mi>900000000</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>ret</span> <span class=o>=</span> <span class=n>setrlimit</span><span class=p>(</span><span class=n>RLIMIT_DATA</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>x</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>ret</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>init</code> 进程在fork子进程时, 修改了data size的大小, 导致子进程的值和shell下的不同, 将改修改注释掉之后, 测试问题解决, 至此, 终于是找到了问题的原因, 短短的一行代码, 花了大功夫进行定位, 由于代码历史悠久, 缺乏文档, 很多问题定位极其困难.</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>k</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2022-09-27 23:05:15
+<a href=/commit/7d2607d55bdd1407f61e5d3f03c9c6e001b06b9b title="add: malloc-error-on-linux">(7d2607d)</a></span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/linue/>linue</a>
+<a href=/tags/c/c++/>C/C++</a></div><nav class=post-nav><a class=prev href=/post/compile-gcc-on-linux/><i class="iconfont icon-left"></i>
+<span class="prev-text nav-default">compile-gcc-on-linux</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/learn-golang/><span class="next-text nav-default">learn-golang</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div></div></main><footer id=footer class=footer><div class=social-links><a href=mailto:kevinhsiang@outlook.com class="iconfont icon-email" title=email></a>
+<a href=https://github.com/Heyxk class="iconfont icon-github" title=github></a>
+<a href=https://cookbyte.net/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2022<span class=heart><i class="iconfont icon-heart"></i></span><span>k</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.min.js integrity="sha256-jwCP0NAdCBloaIWTWHmW4i3snUNMHUNO+jr9rYd2iOI=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.locales.min.js integrity="sha256-ZwofwC1Lf/faQCzN7nZtfijVV6hSwxjQMwXL4gn9qU8=" crossorigin=anonymous></script>
+<script>var languageCode="en".replace(/-/g,"_").replace(/_(.*)/,function(e,t){return e.replace(t,t.toUpperCase())});timeago().render(document.querySelectorAll(".timeago"),languageCode),timeago.cancel()</script><script type=text/javascript src=/js/main.min.4ae89da218555efa0e7093a20b92017d2e1202b66fff9fc2edf4cb8d44b44c6e.js></script></body></html>

@@ -1,0 +1,200 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>compile-gcc-on-linux - k - blog</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="k"><meta name=description content="linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存"><meta name=keywords content="linux,gcc,gcc降版本,编译gcc,gcc4.8.5"><meta name=generator content="Hugo 0.104.1 with theme even"><link rel=canonical href=https://cookbyte.net/post/compile-gcc-on-linux/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.0c7e7da8c1c43ff699e736c73e8d2a620309834483597be8e0e01e53006dc385.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="compile-gcc-on-linux"><meta property="og:description" content="linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存"><meta property="og:type" content="article"><meta property="og:url" content="https://cookbyte.net/post/compile-gcc-on-linux/"><meta property="article:section" content="post"><meta property="article:published_time" content="2022-09-27T13:33:25+00:00"><meta property="article:modified_time" content="2022-09-27T23:03:36+08:00"><meta itemprop=name content="compile-gcc-on-linux"><meta itemprop=description content="linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存"><meta itemprop=datePublished content="2022-09-27T13:33:25+00:00"><meta itemprop=dateModified content="2022-09-27T23:03:36+08:00"><meta itemprop=wordCount content="995"><meta itemprop=keywords content="linux,gcc,"><meta name=twitter:card content="summary"><meta name=twitter:title content="compile-gcc-on-linux"><meta name=twitter:description content="linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>k</a></div><div class=mobile-navbar-icon><span></span>
+<span></span>
+<span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a><a href=/journal/><li class=mobile-menu-item>Journals</li></a><a href=/english><li class=mobile-menu-item>English</li></a><a href=/fitness><li class=mobile-menu-item>Fitness</li></a><a href=/about><li class=mobile-menu-item>About</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>k</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li><li class=menu-item><a class=menu-item-link href=/journal/>Journals</a></li><li class=menu-item><a class=menu-item-link href=/english>English</a></li><li class=menu-item><a class=menu-item-link href=/fitness>Fitness</a></li><li class=menu-item><a class=menu-item-link href=/about>About</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>compile-gcc-on-linux</h1><div class=post-meta><span class=post-time>2022-09-27 13:33:25</span><div class=post-category><a href=/categories/linux/>linux</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#linux降低gcc版本-高版本gccgcc1031下编译低版本gccgcc485-设置gcc版本共存>linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存</a><ul><li><ul><li><a href=#gcc485-源码下载>gcc4.8.5 源码下载</a></li><li><a href=#安装静态库>安装静态库</a></li><li><a href=#下载依赖>下载依赖</a></li><li><a href=#编译>编译</a></li><li><a href=#错误解决>错误解决</a></li><li><a href=#gcc版本共存环境变量配置>gcc版本共存环境变量配置</a></li><li><a href=#提供一份修改好的代码>提供一份修改好的代码</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><h1 id=linux降低gcc版本-高版本gccgcc1031下编译低版本gccgcc485-设置gcc版本共存>linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存</h1><h3 id=gcc485-源码下载>gcc4.8.5 源码下载</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>wget ftp://ftp.gnu.org/gnu/gcc/gcc-4.8.5/gcc-4.8.5.tar.gz
+</span></span><span class=line><span class=cl>tar xzf gcc-4.8.5.tar.gz
+</span></span></code></pre></td></tr></table></div></div><h3 id=安装静态库>安装静态库</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>yum install libstdc++-static
+</span></span></code></pre></td></tr></table></div></div><h3 id=下载依赖>下载依赖</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>cd</span> gcc-4.8.5
+</span></span><span class=line><span class=cl>./contrib/download_prerequisites
+</span></span></code></pre></td></tr></table></div></div><h3 id=编译>编译</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mkdir build
+</span></span><span class=line><span class=cl><span class=nb>cd</span> build
+</span></span><span class=line><span class=cl><span class=c1># 生成makefile, 这些参数可以用已有的gcc参数 gcc -v 可用看到, 也可以自己修改需要的参数</span>
+</span></span><span class=line><span class=cl><span class=c1># prefix指定安装路径</span>
+</span></span><span class=line><span class=cl>../configure --prefix<span class=o>=</span>/opt/gcc4.8.5 --enable-bootstrap --enable-shared --enable-threads<span class=o>=</span>posix --enable-checking<span class=o>=</span>release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-linker-hash-style<span class=o>=</span>gnu --enable-languages<span class=o>=</span>c,c++ --enable-plugin --enable-initfini-array --disable-libgcj --enable-gnu-indirect-function --with-tune<span class=o>=</span>generic --disable-multilib --with-arch_32<span class=o>=</span>x86-64 --build<span class=o>=</span>x86_64-linux-gnu
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 16线程编译, 编译过程耗时较长</span>
+</span></span><span class=line><span class=cl>make -j16
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 安装</span>
+</span></span><span class=line><span class=cl>make install
+</span></span></code></pre></td></tr></table></div></div><h3 id=错误解决>错误解决</h3><h4 id=错误1>错误1</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>In file included from ../../gcc/cp/except.c:1008:
+</span></span><span class=line><span class=cl>cfns.gperf:101:1: error: ‘const char* libc_name_p<span class=o>(</span>const char*, unsigned int<span class=o>)</span>’ redeclared inline with ‘gnu_inline’ attribute
+</span></span><span class=line><span class=cl>cfns.gperf:26:14: note: ‘const char* libc_name_p<span class=o>(</span>const char*, unsigned int<span class=o>)</span>’ previously declared here
+</span></span><span class=line><span class=cl>cfns.gperf:26:14: warning: inline <span class=k>function</span> ‘const char* libc_name_p<span class=o>(</span>const char*, unsigned int<span class=o>)</span>’ used but never defined
+</span></span><span class=line><span class=cl>make<span class=o>[</span>3<span class=o>]</span>: *** <span class=o>[</span>Makefile:1059: cp/except.o<span class=o>]</span> Error <span class=m>1</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>3<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build/gcc&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>2<span class=o>]</span>: *** <span class=o>[</span>Makefile:4163: all-stage1-gcc<span class=o>]</span> Error <span class=m>2</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>2<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>1<span class=o>]</span>: *** <span class=o>[</span>Makefile:20822: stage1-bubble<span class=o>]</span> Error <span class=m>2</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>1<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build&#39;</span>
+</span></span><span class=line><span class=cl>make: *** <span class=o>[</span>Makefile:892: all<span class=o>]</span> Error <span class=m>2</span>
+</span></span></code></pre></td></tr></table></div></div><p><a href="https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=ec1cc0263f156f70693a62cf17b254a0029f4852">patch地址</a></p><h4 id=错误2>错误2</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>In file included from ../../../libgcc/unwind-dw2.c:405:0:
+</span></span><span class=line><span class=cl>./md-unwind-support.h: In <span class=k>function</span> ‘x86_64_fallback_frame_state’:
+</span></span><span class=line><span class=cl>./md-unwind-support.h:65:47: error: dereferencing pointer to incomplete <span class=nb>type</span>
+</span></span><span class=line><span class=cl>       <span class=nv>sc</span> <span class=o>=</span> <span class=o>(</span>struct sigcontext *<span class=o>)</span> <span class=o>(</span>void *<span class=o>)</span> <span class=p>&amp;</span>uc_-&gt;uc_mcontext<span class=p>;</span>
+</span></span><span class=line><span class=cl>                                               ^
+</span></span><span class=line><span class=cl>make<span class=o>[</span>3<span class=o>]</span>: *** <span class=o>[</span>../../../libgcc/shared-object.mk:14: unwind-dw2.o<span class=o>]</span> Error <span class=m>1</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>3<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build/x86_64-linux-gnu/libgcc&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>2<span class=o>]</span>: *** <span class=o>[</span>Makefile:16943: all-stage1-target-libgcc<span class=o>]</span> Error <span class=m>2</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>2<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>1<span class=o>]</span>: *** <span class=o>[</span>Makefile:20822: stage1-bubble<span class=o>]</span> Error <span class=m>2</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>1<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build&#39;</span>
+</span></span><span class=line><span class=cl>make: *** <span class=o>[</span>Makefile:892: all<span class=o>]</span> Error <span class=m>2</span>
+</span></span></code></pre></td></tr></table></div></div><p><a href="https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=16b277761b432510ad6dcf72d877ae72b5f0a4b7">patch地址</a></p><h4 id=错误3>错误3</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>../../../../libsanitizer/asan/asan_linux.cc: In <span class=k>function</span> ‘bool __asan::AsanInterceptsSignal<span class=o>(</span>int<span class=o>)</span>’:
+</span></span><span class=line><span class=cl>../../../../libsanitizer/asan/asan_linux.cc:95:20: error: ‘SIGSEGV’ was not declared in this scope
+</span></span><span class=line><span class=cl>   <span class=k>return</span> <span class=nv>signum</span> <span class=o>==</span> SIGSEGV <span class=o>&amp;&amp;</span> flags<span class=o>()</span>-&gt;handle_segv<span class=p>;</span>
+</span></span><span class=line><span class=cl>                    ^
+</span></span><span class=line><span class=cl>../../../../libsanitizer/asan/asan_linux.cc:96:1: warning: control reaches end of non-void <span class=k>function</span> <span class=o>[</span>-Wreturn-type<span class=o>]</span>
+</span></span><span class=line><span class=cl> <span class=o>}</span>
+</span></span><span class=line><span class=cl> ^
+</span></span><span class=line><span class=cl>make<span class=o>[</span>4<span class=o>]</span>: *** <span class=o>[</span>Makefile:441: asan_linux.lo<span class=o>]</span> Error <span class=m>1</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>4<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build/x86_64-linux-gnu/libsanitizer/asan&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>3<span class=o>]</span>: *** <span class=o>[</span>Makefile:326: all-recursive<span class=o>]</span> Error <span class=m>1</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>3<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build/x86_64-linux-gnu/libsanitizer&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>2<span class=o>]</span>: *** <span class=o>[</span>Makefile:15546: all-stage1-target-libsanitizer<span class=o>]</span> Error <span class=m>2</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>2<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>1<span class=o>]</span>: *** <span class=o>[</span>Makefile:20822: stage1-bubble<span class=o>]</span> Error <span class=m>2</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>1<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build&#39;</span>
+</span></span><span class=line><span class=cl>make: *** <span class=o>[</span>Makefile:892: all<span class=o>]</span> Error <span class=m>2</span>
+</span></span></code></pre></td></tr></table></div></div><p><a href=https://patchwork.ozlabs.org/project/gcc/patch/6824253.3U2boEivI2@devpool21>patch地址</a></p><h4 id=错误4>错误4</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>../../../../libsanitizer/tsan/tsan_platform_linux.cc: In <span class=k>function</span> ‘int __tsan::ExtractResolvFDs<span class=o>(</span>void*, int*, int<span class=o>)</span>’:
+</span></span><span class=line><span class=cl>../../../../libsanitizer/tsan/tsan_platform_linux.cc:295:16: error: ‘statp’ was not declared in this scope
+</span></span><span class=line><span class=cl>   __res_state *statp <span class=o>=</span> <span class=o>(</span>__res_state*<span class=o>)</span>state<span class=p>;</span>
+</span></span><span class=line><span class=cl>                ^
+</span></span><span class=line><span class=cl>../../../../libsanitizer/tsan/tsan_platform_linux.cc:295:37: error: expected primary-expression before ‘<span class=o>)</span>’ token
+</span></span><span class=line><span class=cl>   __res_state *statp <span class=o>=</span> <span class=o>(</span>__res_state*<span class=o>)</span>state<span class=p>;</span>
+</span></span><span class=line><span class=cl>                                     ^
+</span></span><span class=line><span class=cl>../../../../libsanitizer/tsan/tsan_platform_linux.cc:295:38: error: expected ‘<span class=p>;</span>’ before ‘state’
+</span></span><span class=line><span class=cl>   __res_state *statp <span class=o>=</span> <span class=o>(</span>__res_state*<span class=o>)</span>state<span class=p>;</span>
+</span></span><span class=line><span class=cl>                                      ^
+</span></span><span class=line><span class=cl>make<span class=o>[</span>4<span class=o>]</span>: *** <span class=o>[</span>Makefile:475: tsan_platform_linux.lo<span class=o>]</span> Error <span class=m>1</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>4<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build/x86_64-linux-gnu/libsanitizer/tsan&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>3<span class=o>]</span>: *** <span class=o>[</span>Makefile:326: all-recursive<span class=o>]</span> Error <span class=m>1</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>3<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build/x86_64-linux-gnu/libsanitizer&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>2<span class=o>]</span>: *** <span class=o>[</span>Makefile:15546: all-stage1-target-libsanitizer<span class=o>]</span> Error <span class=m>2</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>2<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build&#39;</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>1<span class=o>]</span>: *** <span class=o>[</span>Makefile:20822: stage1-bubble<span class=o>]</span> Error <span class=m>2</span>
+</span></span><span class=line><span class=cl>make<span class=o>[</span>1<span class=o>]</span>: Leaving directory <span class=s1>&#39;/root/gcc-4.8.5-fixed/build&#39;</span>
+</span></span><span class=line><span class=cl>make: *** <span class=o>[</span>Makefile:892: all<span class=o>]</span> Error <span class=m>2</span>
+</span></span></code></pre></td></tr></table></div></div><p><a href="https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=144e36a796e9f293817c6d0a3413fa3fcc51c7ad">patch地址</a></p><h4 id=arm平台编译问题>ARM平台编译问题</h4><p>arm平台上编译会因为依赖版本低, 导致编译失败</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-diff data-lang=diff><span class=line><span class=cl><span class=gd>- MPFR=mpfr-2.4.2
+</span></span></span><span class=line><span class=cl><span class=gd>- GMP=gmp-4.3.2
+</span></span></span><span class=line><span class=cl><span class=gd>- MPC=mpc-0.8.1
+</span></span></span><span class=line><span class=cl><span class=gd></span><span class=gi>+ MPFR=mpfr-4.1.0
+</span></span></span><span class=line><span class=cl><span class=gi>+ GMP=gmp-6.2.1
+</span></span></span><span class=line><span class=cl><span class=gi>+ MPC=mpc-1.2.1
+</span></span></span></code></pre></td></tr></table></div></div><p>修改<code>contrib/download_prerequisites</code> 文件, 升级依赖版本即可</p><h3 id=gcc版本共存环境变量配置>gcc版本共存环境变量配置</h3><h4 id=切换gcc版本到gcc485>切换gcc版本到gcc4.8.5</h4><h5 id=关键配置>关键配置</h5><ul><li><code>PATH</code> , 配置gcc命令的路径, 若指定gcc版本, 需将gcc路径配置在系统原有PATH之前</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># gcc</span>
+</span></span><span class=line><span class=cl><span class=nv>GCCDIR</span><span class=o>=</span>/opt/gcc4.8.5
+</span></span><span class=line><span class=cl><span class=c1># path</span>
+</span></span><span class=line><span class=cl><span class=nv>PATH</span><span class=o>=</span><span class=nv>$GCCDIR</span>/bin:<span class=nv>$PATH</span>
+</span></span><span class=line><span class=cl><span class=nb>export</span> PATH
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>LIBRARY_PATH</code> , 该环境变量配置程序编译时库查找路径</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=nv>LIBRARY_PATH</span><span class=o>=</span><span class=nv>$GCCDIR</span>/lib64:<span class=nv>$LIBRARY_PATH</span>
+</span></span><span class=line><span class=cl><span class=nb>export</span> LIBRARY_PATH
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>LD_LIBRARY_PATH</code>, 该环境变量配置程序运行时库查找路径</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=nv>LD_LIBRARY_PATH</span><span class=o>=</span><span class=nv>$GCCDIR</span>/lib64:<span class=nv>$LD_LIBRARY_PA</span>
+</span></span><span class=line><span class=cl><span class=nb>export</span> LD_LIBRARY_PATH
+</span></span></code></pre></td></tr></table></div></div><h3 id=提供一份修改好的代码>提供一份修改好的代码</h3><p><a href=https://github.com/Heyxk/gcc-4.8.5-fixed>gcc-4.8.5-fixed</a></p></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>k</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2022-09-27 23:03:36
+<a href=/commit/057c130823b59f7b1ba6b559ab42be84be1a9c74 title="add: compile-gcc-on-linux">(057c130)</a></span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/linux/>linux</a>
+<a href=/tags/gcc/>gcc</a></div><nav class=post-nav><a class=next href=/post/malloc-error-on-linux/><span class="next-text nav-default">malloc-error-on-linux</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div></div></main><footer id=footer class=footer><div class=social-links><a href=mailto:kevinhsiang@outlook.com class="iconfont icon-email" title=email></a>
+<a href=https://github.com/Heyxk class="iconfont icon-github" title=github></a>
+<a href=https://cookbyte.net/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2022<span class=heart><i class="iconfont icon-heart"></i></span><span>k</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.min.js integrity="sha256-jwCP0NAdCBloaIWTWHmW4i3snUNMHUNO+jr9rYd2iOI=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.locales.min.js integrity="sha256-ZwofwC1Lf/faQCzN7nZtfijVV6hSwxjQMwXL4gn9qU8=" crossorigin=anonymous></script>
+<script>var languageCode="en".replace(/-/g,"_").replace(/_(.*)/,function(e,t){return e.replace(t,t.toUpperCase())});timeago().render(document.querySelectorAll(".timeago"),languageCode),timeago.cancel()</script><script type=text/javascript src=/js/main.min.4ae89da218555efa0e7093a20b92017d2e1202b66fff9fc2edf4cb8d44b44c6e.js></script></body></html>
