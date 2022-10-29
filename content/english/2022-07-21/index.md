@@ -4,9 +4,9 @@ date: 2022-07-21 14:39:44
 lastmod: 2022-07-21 14:39:44
 author: "k"
 description: ""
-keywords: ["english", "vocabulary"]
-tags: ["english", "vocabulary"]
-categories: ["english", "vocabulary"]
+keywords: ["vocabulary"]
+tags: ["vocabulary"]
+categories: ["english"]
 comment: true
 toc: true
 draft: false

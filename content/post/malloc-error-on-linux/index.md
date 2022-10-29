@@ -1,17 +1,17 @@
 ---
 date: 2022-09-27 13:28:22
-title: malloc-error-on-linux
+title: "linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM"
 author: "k"
 description: "linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM"
 keywords: ["linux", "C/C++", "mmap", "ENOMEM", "new", "malloc"]
-tags: ["linue", "C/C++"]
+tags: ["linux", "C/C++"]
 categories: ["C/C++"]
 comment: true
 toc: true
 draft: false
 ---
 
-# linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM
+<!-- # linux下new/malloc内存分配失败问题分析 - mmap系统调用返回ENOMEM -->
 ## 问题背景
 公司新产品需要高性能业务平台, 需要对现有的平台进行性能优化, 进行一系列优化后, 性能提升50%左右, 但是做性能测试时发现, 进程存在使用 `new/malloc` 分配内存时失败的情况, 导致进程coredump, 无法完成稳定性行测试, 于是通过 `valgrind` 和 `strace` 等工具分析定位高负载情况下, 进程分配内存失败问题.
 

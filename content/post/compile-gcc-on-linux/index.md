@@ -1,6 +1,6 @@
 ---
 date: 2022-09-27 13:33:25
-title: compile-gcc-on-linux
+title: "linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存"
 author: "k"
 description: "linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存"
 keywords: ["linux", "gcc", "gcc降版本", "编译gcc", "gcc4.8.5"]
@@ -11,7 +11,7 @@ toc: true
 draft: false
 ---
 
-# linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存
+<!-- # linux降低gcc版本, 高版本gcc(gcc10.3.1)下编译低版本gcc(gcc4.8.5), 设置gcc版本共存 -->
 
 ### gcc4.8.5 源码下载
 ```bash

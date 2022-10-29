@@ -5,8 +5,8 @@ lastmod: 2022-07-17 14:41:07
 author: "k"
 description: "英语学习相关参考资料"
 keywords: ["english reference"]
-tags: ["english learn reference"]
-categories: ["english learn"]
+tags: ["english", "reference"]
+categories: ["english"]
 comment: true
 toc: true
 draft: false
