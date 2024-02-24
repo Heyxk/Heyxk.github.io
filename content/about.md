@@ -7,10 +7,10 @@ description: ""
 keywords: []
 tags: []
 categories: []
-comment: true
+comments: false
 toc: true
 draft: false
 ---
 
 # May 6, 2022
-This is kk
+This is k's blog.
