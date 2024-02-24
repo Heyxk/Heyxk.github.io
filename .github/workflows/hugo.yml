@@ -19,15 +19,6 @@ jobs:
           hugo-version: "latest" # 可以修改为你使用的 Hugo 版本
           extended: true # 设置是否需要 extended 版本
 
-      - name: Modify theme-even font
-        run: |
-          sed -i "s/\$global-serif-font-family: Athelas, STHeiti, Microsoft Yahei, serif \!default;/\$global-serif-font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif \!default;/g" themes/even/assets/sass/_variables.scss
-          sed -i "s/\$logo-font-family: 'Chancery', cursive, LiSu, sans-serif \!default;/\$logo-font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif \!default;/g" themes/even/assets/sass/_variables.scss
-          sed -i "s/\$theme-color-config: 'Default';/\$theme-color-config: 'Mint Green';/g" themes/even/assets/sass/_variables.scss
-          sed -i "/\/\/ Font family: Chancery/,+13d" themes/even/assets/sass/_variables.scss
-          rm -r themes/even/static/fonts/chancery
-          rm -r themes/even/static/img/reward
-
       - name: Build
         run: hugo --minify
 
