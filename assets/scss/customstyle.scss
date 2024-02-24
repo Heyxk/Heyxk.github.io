@@ -1,0 +1,63 @@
+:root {
+  --font-family-paragraph: 'JetBrainsMono', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFangSC-Regular", "Hiragino Sans GB", "Lantinghei SC", "Microsoft Yahei", "Source Han Sans CN", "WenQuanYi Micro Hei", SimSun, sans-serif;
+  --font-family-title: 'JetBrainsMono', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFangSC-Regular", "Hiragino Sans GB", "Lantinghei SC", "Microsoft Yahei", "Source Han Sans CN", "WenQuanYi Micro Hei", SimSun, sans-serif;
+  --font-family-code: 'JetBrainsMono', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFangSC-Regular", "Hiragino Sans GB", "Lantinghei SC", "Microsoft Yahei", "Source Han Sans CN", "WenQuanYi Micro Hei", SimSun, sans-serif;
+  --text-content-color: #222;
+  --text-highlight-color: #FC9151;
+  --frame-dark-color: #332D2F;
+  --frame-color: #eee;
+  // 日间模式主题颜色修改
+  --theme: rgb(245, 245, 245)
+}
+
+
+@import 'comment';
+
+
+@font-face {
+  font-family: JetBrainsMono;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  unicode-range: U+61-7a, U+41-5a, U+30-39;
+}
+
+html,
+body {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family-paragraph);
+}
+
+.dark {
+  --theme: #1A1718;
+}
+
+.wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.highlight {
+  background-color: var(--bankuai-color);
+}
+
+//文本选择高亮颜色
+::selection {
+  background: #ffe8da;
+}
+
+// 页面上滑加载动画
+@media (min-width: 900px) {
+  .img-hide {
+    opacity: 0;
+    transform: translateY(6%);
+    transition: opacity 0.4s ease, transform 0.8s ease;
+  }
+
+  .img-hide.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

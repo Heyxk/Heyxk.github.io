@@ -1,0 +1,16 @@
+<!-- {{- /* Head custom content area start */ -}} -->
+<!-- {{- /*     Insert any custom code (web-analytics, resources, etc.) - it will appear in the <head></head> section of every page. */ -}} -->
+<!-- {{- /*     Can be overwritten by partial with the same name in the global layouts. */ -}} -->
+
+{{ if hugo.IsProduction | or (eq site.Params.env "production") }}
+{{ $style := resources.Get "scss/customstyle.scss" | resources.ExecuteAsTemplate "customstyle.scss" . | toCSS (dict "targetPath" "css/customstyle.css" "enableSourceMap" true) }}
+<link rel="stylesheet" href="{{ ($style | minify | fingerprint).RelPermalink }}">
+{{ else }}
+{{ $style := resources.Get "scss/customstyle.scss" | resources.ExecuteAsTemplate "customstyle.scss" . | toCSS (dict "targetPath" "css/customstyle.css" "enableSourceMap" false) }}
+<link rel="stylesheet" href="{{ ($style).RelPermalink }}">
+{{ end }}
+
+{{- $umamiJS := $.Site.Params.umami.cdnJS | default "/js/lalala.js" -}}
+<script async src='{{ $umamiJS }}' data-website-id='{{ $.Site.Params.umami.data_website_id }}' data-host-url='{{ $.Site.Params.umami.data_host_url }}'></script>
+
+<!-- {{- /* Head custom content area end */ -}} -->
