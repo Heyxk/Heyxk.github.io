@@ -1,14 +1,17 @@
 ---
-date: 2025-11-28 12:58:15
-lastmod: 2025-11-28 12:58:15
+date: 2025-11-28 11:37:40
+lastmod: 2025-11-28 11:37:40
 title: "小米 Mini 刷 OpenWrt 24.10 使用品胜 MA156 (中兴微) 4G 网卡"
 author: "k"
+# weight: 1
+# aliases: ["/first"]
 tags: ["openwrt"]
 categories: []
 draft: false
 comments: true
 description: "小米 Mini 刷 OpenWrt 24.10 使用品胜 MA156 (中兴微) 4G 网卡"
 ---
+
 
 <!-- # 小米 Mini 刷 OpenWrt 24.10 使用品胜 MA156 (中兴微) 4G 网卡 -->
 ## 小米 Mini 刷 OpenWrt 24.10 使用品胜 MA156 (中兴微) 4G 网卡
