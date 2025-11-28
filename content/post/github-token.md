@@ -47,7 +47,7 @@ GitHub Actions 使用方式：
 - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # 另外还支持 github_token 和 deploy_key (https://github.com/peaceiris/actions-gh-pages#readme)
+          github_token: ${{ secrets.GITHUB_TOKEN }} # 另外还支持 deploy_key 和 personal access token (https://github.com/peaceiris/actions-gh-pages#readme)
 ```
 
 ## `deploy_key`
