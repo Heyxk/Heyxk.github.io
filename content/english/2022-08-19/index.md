@@ -1,7 +1,6 @@
 ---
 date: 2022-08-19 00:43:28
 lastmod: 2022-08-19 00:43:28
-title: 2022-08-19
 title: "每日词汇"
 author: "k"
 description: "每日英语词汇"
