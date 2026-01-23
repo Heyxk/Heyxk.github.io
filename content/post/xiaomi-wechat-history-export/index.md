@@ -20,7 +20,7 @@ draft: false
 
 #### 需要的工具
 
-[此处下载](https://github.com/Heyxk.github.io/tree/master/content/post/xiaomi-wechat-history-export/wechat-tools)
+[此处下载](https://github.com/Heyxk/Heyxk.github.io/tree/master/content/post/xiaomi-wechat-history-export/wechat-tools)
 
 ##### 环境
 
