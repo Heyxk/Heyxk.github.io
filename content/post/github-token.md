@@ -35,11 +35,11 @@ description: ""
 
 <!-- Feb 24, 2024 -->
 
-# github 三种不同的 token
+## github 三种不同的 token
 
-## `GITHUB_TOKEN`
+### `GITHUB_TOKEN`
 
-该 token 为用于 GitHub actions 的内置 token, 可用于对执行 actions 的仓库进行访问操作，直接使用 `secrets.GITHUB_TOKEN` 即可在 GitHub actions 中使用。
+该 token 为用于 GitHub actions 的内置 token, 运行 actions 自动生成，可用于对执行 actions 的仓库进行访问操作，直接使用 `secrets.GITHUB_TOKEN` 即可在 GitHub actions 中使用。
 
 GitHub Actions 使用方式：
 
@@ -50,7 +50,7 @@ GitHub Actions 使用方式：
           github_token: ${{ secrets.GITHUB_TOKEN }} # 另外还支持 deploy_key 和 personal access token (https://github.com/peaceiris/actions-gh-pages#readme)
 ```
 
-## `deploy_key`
+### `deploy_key`
 
 该 key 针对仓库，是公钥加私钥形式，可使用 SSH key, 配置方式如下
 
@@ -62,7 +62,6 @@ ssh-keygen -t rsa -C me@xxx.com
 ```
 
 其中 <me@xxx.com> 就是 GitHub 账号的邮箱。
-
 2. 填写 Deploy Keys 和 Secrets
 
 打开源码仓库，在设置中找到「Secrets」
@@ -86,7 +85,7 @@ GitHub Actions 使用方式：
           deploy_key: ${{ secrets.DEPLOY_KEY }} # 另外还支持 github_token 和 personal_token (https://github.com/peaceiris/actions-gh-pages#readme)
 ```
 
-## `personal access token`
+### `personal access token`
 
 token 的生成需要到这里：个人头像 -> Settings -> Developer settings -> Personal access tokens，点击 Generate new token。这一步需要输入密码，然后可以根据需要定制 token 的权限
 
