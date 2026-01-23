@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IMAGE="betterweb/hugo:extended-0.121.1-20-1"
-UID="1030:1030"
+USER_ID="1030:1030"  # 修正：将变量名从 UID 改为 USER_ID
 
 # --- 模式 1: 启动 Server (后台运行) ---
 if [ "$1" = "server" ]; then
@@ -10,7 +10,7 @@ if [ "$1" = "server" ]; then
   [ -z "$URL" ] && echo "Error: 请指定 baseURL (例如: $0 server http://example.com:1313)" && exit 1
 
   echo ">> 启动后台服务 (URL: $URL)..."
-  docker run -d --name hugo --restart unless-stopped --user "$UID" \
+  docker run -d --name hugo --restart unless-stopped --user "$USER_ID" \
     -v "$PWD":/home/app -p 1313:1313 "$IMAGE" \
     -c "hugo server -D -w --bind \"0.0.0.0\" -b \"$URL\" --disableFastRender"
 
@@ -20,7 +20,7 @@ else
   ARGS=${*:-"version"}
   
   # 执行命令 (临时容器用完即删)
-  docker run --rm -it --user "$UID" \
+  docker run --rm -it --user "$USER_ID" \
     -v "$PWD":/home/app "$IMAGE" \
     -c "hugo $ARGS"
 fi
