@@ -20,7 +20,11 @@ draft: false
 
 #### 需要的工具
 
-[此处下载](<../_assets/post/xiaomi-wechat-history-export/wechat-tools/>)
+[abe.jar](<../_assets/post/xiaomi-wechat-history-export/wechat-tools/abe.jar>)
+[IMEI.java](<../_assets/post/xiaomi-wechat-history-export/wechat-tools/IMEI.java>)
+[IMEI.class](<../_assets/post/xiaomi-wechat-history-export/wechat-tools/IMEI.class>)
+[MapTest.java](<../_assets/post/xiaomi-wechat-history-export/wechat-tools/MapTest.java>)
+[MapTest.class](<../_assets/post/xiaomi-wechat-history-export/wechat-tools/MapTest.class>)
 
 ##### 环境
 
