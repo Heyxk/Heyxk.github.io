@@ -70,6 +70,19 @@ jobs:
             "content/" \
             "site/content/"
 
+      - name: Copy _assets to Hugo static
+        run: |
+          if [ -d "content/_assets" ]; then
+            mkdir -p site/static
+            cp -r content/_assets site/static/_assets
+          fi
+
+      - name: Fix asset paths for Hugo
+        run: |
+          # Only replace ../_assets/ inside markdown link/image syntax ]( or ](<
+          # Avoids false positives in code blocks or plain text
+          find site/content -name "*.md" -exec sed -i -E 's|(\]\(<?)\.\./_assets/|\1/_assets/|g' {} +
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
